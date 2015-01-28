@@ -36,7 +36,7 @@ dependencies.
 		Category
 	)
 
-	ItemID -> Name, Category, Buy_Price, Description, First_Bid, Started, Ends
+	ItemID -> Name, Buy_Price, Description, First_Bid, Started, Ends, Currently
 	BidID -> UserID, ItemID, Time, Amount
 	UserID -> Location, Country, Rating
 
