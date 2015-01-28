@@ -6,20 +6,20 @@ dependencies.
 	
 	Item(
 		ItemID, //KEY
+		UserID,
 		Name,
-		Category,
 		Buy_Price,
 		Description,
 		First_Bid,
 		Started,
-		Ends 
+		Ends,
+		Currently
 	)
 	
 	Bid(
 		BidID, //KEY
 		UserID,
 		ItemID,
-		Currently,
 		Time,
 		Amount
 	)
