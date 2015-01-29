@@ -39,7 +39,10 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.Date;
 
 class MyParser {
     
@@ -47,19 +50,19 @@ class MyParser {
     static DocumentBuilder builder;
     
     static final String[] typeName = {
-	"none",
-	"Element",
-	"Attr",
-	"Text",
-	"CDATA",
-	"EntityRef",
-	"Entity",
-	"ProcInstr",
-	"Comment",
-	"Document",
-	"DocType",
-	"DocFragment",
-	"Notation",
+    "none",
+    "Element",
+    "Attr",
+    "Text",
+    "CDATA",
+    "EntityRef",
+    "Entity",
+    "ProcInstr",
+    "Comment",
+    "Document",
+    "DocType",
+    "DocFragment",
+    "Notation",
     };
     
     static class MyErrorHandler implements ErrorHandler {
@@ -85,6 +88,7 @@ class MyParser {
     }
     
     /* Non-recursive (NR) version of Node.getElementsByTagName(...)
+     * Array 
      */
     static Element[] getElementsByTagNameNR(Element e, String tagName) {
         Vector< Element > elements = new Vector< Element >();
@@ -101,8 +105,9 @@ class MyParser {
         return result;
     }
     
-    /* Returns the first subelement of e matching the given tagName, or
+    /* Returns the first subelement of e matching the given tagName, or 
      * null if one does not exist. NR means Non-Recursive.
+     * To get the attribute
      */
     static Element getElementByTagNameNR(Element e, String tagName) {
         Node child = e.getFirstChild();
@@ -116,6 +121,7 @@ class MyParser {
     
     /* Returns the text associated with the given element (which must have
      * type #PCDATA) as child, or "" if it contains no text.
+     * To get the actual text within the tags
      */
     static String getElementText(Element e) {
         if (e.getChildNodes().getLength() == 1) {
@@ -183,10 +189,138 @@ class MyParser {
         /* Fill in code here (you will probably need to write auxiliary
             methods). */
         
+        /*Store all items in a list to iterate through and parse with tags Item*/
+        Element[] itemslist = getElementsByTagNameNR(doc.getDocumentElement(), "Item");
         
+        try
+        {
+            for(int i = 0; i < itemslist.length; i++)
+            {
+                parseItems(itemslist[i]);
+                parseUsers(itemslist[i]);
+                parseBids(itemslist[i]);
+                parseCategories(itemslist[i]);
+            }
+        }catch(IOException e) {
+            e.printStackTrace();
+        }
+        /**************************************************************/      
+    }
+    
+    public static BufferedWriter itemsDoc;
+    public static BufferedWriter usersDoc;
+    public static BufferedWriter bidsDoc;
+    public static BufferedWriter categoryDoc;
+    
+    public static String makeTuples(String[] input)
+    {
+        String tupleRows = "";
+        int k;
+        for(k = 0; k < input.length-1; k++)
+        {
+            tupleRows += input[k] + columnSeparator;
+        }
+        /*Append the last element without separator*/
+        tupleRows += input[k];
+        return tupleRows;
+    }
+    
+    public static void load(BufferedWriter output, String... args) throws IOException
+    {
+        if(args.length == 0)
+        {
+            System.out.println("Error in loading the file");
+            return;
+        }
+        else
+        {
+            output.write(makeTuples(args));
+            output.newLine();
+        }
+    }
+    
+    public static String timestamp(String XMLdate)
+    {
+        SimpleDateFormat correctFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat wrongFormat = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+        try
+        {
+            Date parsedDate = wrongFormat.parse(XMLdate);
+            return correctFormat.format(parsedDate);
+        } catch(ParseException p) {
+            System.err.println("Error! Could not parse the time!");
+            return "blah";
+        }
+    }
+    
+    public static void parseItems(Element itemslist) throws IOException
+    {
+        String itemID = itemslist.getAttribute("ItemID");
+        Element seller = getElementByTagNameNR(itemslist, "Seller");
+        String userID = seller.getAttribute("UserID");
+        String name = getElementTextByTagNameNR(itemslist, "Name");
+        String buy_price = strip(getElementTextByTagNameNR(itemslist, "Buy_Price"));
+        String description = getElementTextByTagNameNR(itemslist, "Description");
+        if(description.length() > 4000)
+        {
+            description = description.substring(0, 3999);
+        }
+        String first_bid = strip(getElementTextByTagNameNR(itemslist, "First_Bid"));
+        String started = timestamp(getElementTextByTagNameNR(itemslist, "Started"));
+        String ends = timestamp(getElementTextByTagNameNR(itemslist, "Ends"));
+        String currently = strip(getElementTextByTagNameNR(itemslist, "Currently"));
         
-        /**************************************************************/
+        load(itemsDoc, itemID, userID, name, buy_price, description, first_bid, started, ends, currently);
+    }
+    
+    public static void parseUsers(Element itemslist) throws IOException
+    {
+        Element sellingPerson = getElementByTagNameNR(itemslist, "Seller");
+        String userID = sellingPerson.getAttribute("UserID");
+        String location = getElementText(getElementByTagNameNR(itemslist, "Location"));
+        if(location == null)
+        {
+            location = "";
+        }
+        String country = getElementText(getElementByTagNameNR(itemslist, "Country"));
+        if(country == null)
+        {
+            country = "";
+        }
+        String rating = sellingPerson.getAttribute("Rating");
         
+        Element[] bids = getElementsByTagNameNR(getElementByTagNameNR(itemslist, "Bidder"), "Bid");
+        for(int j = 0; j < bids.length; j++)
+        {
+            Element bidder = getElementByTagNameNR(bids[j], "Bidder");
+            String bidderID = bidder.getAttribute("UserID");
+            String bidderRating = bidder.getAttribute("Rating");
+            String bidderLocation = bidder.getAttribute("Location");
+            if(bidderLocation == null)
+            {
+                bidderLocation = "";
+            }
+            String bidderCountry = bidder.getAttribute("Country");
+            if(bidderCountry == null)
+            {
+                bidderCountry = "";
+            }
+            load(usersDoc, bidderID, bidderRating, bidderLocation, bidderCountry);
+        }
+        
+        load(usersDoc, userID, location, country, rating);
+    }
+    
+    public static void parseBids(Element itemslist) 
+    {
+        
+    }
+    
+    public static void parseCategories(Element itemslist) {
+        /*
+        String itemID = itemslist.getAttribute("ItemID");
+        Element[] categories = getElementsByTagNameNR(itemslist, "Category");
+        */
     }
     
     public static void main (String[] args) {
