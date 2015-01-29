@@ -266,8 +266,8 @@ class MyParser {
             description = description.substring(0, 3999);
         }
         String first_bid = strip(getElementTextByTagNameNR(itemslist, "First_Bid"));
-        String started = timestamp(getElementTextByTagNameNR(itemslist, "Started"));
-        String ends = timestamp(getElementTextByTagNameNR(itemslist, "Ends"));
+        String started = timestamp(getElementTextByTagNameNR(itemslist, "Started")).toString();
+        String ends = timestamp(getElementTextByTagNameNR(itemslist, "Ends")).toString();
         String currently = strip(getElementTextByTagNameNR(itemslist, "Currently"));
         
         load(itemsDoc, itemID, userID, name, buy_price, description, first_bid, started, ends, currently);
@@ -311,16 +311,35 @@ class MyParser {
         load(usersDoc, userID, location, country, rating);
     }
     
-    public static void parseBids(Element itemslist) 
+    private static int bidID = 0;
+    public static void parseBids(Element itemslist) throws IOException
     {
-        
+        /*bidID already handled*/
+        String itemID = itemslist.getAttribute("ItemID");
+        Element[] bidss = getElementsByTagNameNR(getElementByTagNameNR(itemslist, "Bids"), "Bid");
+        for(int k = 0; k < bidss.length; k++)
+        {
+            bidID++;
+            Element bidder = getElementByTagNameNR(bidss[k], "Bidder");
+            String userID = bidder.getAttribute("UserID");
+            String wrongTime = getElementTextByTagNameNR(bidss[k], "Time");
+            String correctTime = timestamp(wrongTime).toString();
+            String amount = strip(getElementTextByTagNameNR(bidss[k], "Amount"));
+            
+            load(bidsDoc, String.valueOf(bidID), userID, itemID, correctTime, amount);
+        }
     }
     
-    public static void parseCategories(Element itemslist) {
-        /*
+    public static void parseCategories(Element itemslist) throws IOException
+    {
         String itemID = itemslist.getAttribute("ItemID");
         Element[] categories = getElementsByTagNameNR(itemslist, "Category");
-        */
+        for(int i = 0; i < categories.length; i++)
+        {
+            String category = getElementText(categories[i]);
+            
+            load(categoryDoc, itemID, category);
+        }
     }
     
     public static void main (String[] args) {
