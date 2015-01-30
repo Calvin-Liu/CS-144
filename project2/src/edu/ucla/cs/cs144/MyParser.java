@@ -28,10 +28,12 @@ package edu.ucla.cs.cs144;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
@@ -39,6 +41,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -365,10 +368,26 @@ class MyParser {
             System.exit(2);
         }
         
-        /* Process all files listed on command line. */
-        for (int i = 0; i < args.length; i++) {
-            File currentFile = new File(args[i]);
-            processFile(currentFile);
+        try 
+        {
+            itemsDoc = new BufferedWriter(new FileWriter("item.dat", true));
+            usersDoc = new BufferedWriter(new FileWriter("user.dat", true));
+            bidsDoc = new BufferedWriter(new FileWriter("bids.dat", true));
+            categoryDoc = new BufferedWriter(new FileWriter("category.dat", true));
+            
+            /* Process all files listed on command line. */
+            for (int i = 0; i < args.length; i++) {
+                File currentFile = new File(args[i]);
+                processFile(currentFile);
+            }
+            
+            itemsDoc.close();
+            usersDoc.close();
+            bidsDoc.close();
+            categoryDoc.close();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
