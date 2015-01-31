@@ -16,6 +16,8 @@ dependencies.
 		Currently,
 		Location,
 		Country,
+		Latitude,
+		Longitude
 	)
 	
 	Bid(
