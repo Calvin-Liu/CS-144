@@ -13,7 +13,9 @@ dependencies.
 		First_Bid,
 		Started,
 		Ends,
-		Currently
+		Currently,
+		Location,
+		Country,
 	)
 	
 	Bid(
@@ -36,9 +38,11 @@ dependencies.
 		Category
 	)
 
-	ItemID -> Name, Buy_Price, Description, First_Bid, Started, Ends, Currently
+	ItemID -> Name, Buy_Price, Description, First_Bid, Started, Ends, Currently, Location, Country
 	BidID -> UserID, ItemID, Time, Amount
 	UserID -> Location, Country, Rating
+
+	Note: Number_Of_Bids is not needed with this
 
 
 	For these relations, I used BCNF form instead of 4NF because we dont have multivalued dependencies where one attribute yields two different values for different attributes
