@@ -263,6 +263,10 @@ class MyParser {
         String userID = seller.getAttribute("UserID");
         String name = getElementTextByTagNameNR(itemslist, "Name");
         String buy_price = strip(getElementTextByTagNameNR(itemslist, "Buy_Price"));
+        if(buy_price == null)
+        {
+            buy_price = "";
+        }
         String description = getElementTextByTagNameNR(itemslist, "Description");
         if(description.length() > 4000)
         {
@@ -272,8 +276,21 @@ class MyParser {
         String started = timestamp(getElementTextByTagNameNR(itemslist, "Started")).toString();
         String ends = timestamp(getElementTextByTagNameNR(itemslist, "Ends")).toString();
         String currently = strip(getElementTextByTagNameNR(itemslist, "Currently"));
-        
-        load(itemsDoc, itemID, userID, name, buy_price, description, first_bid, started, ends, currently);
+        String location = getElementTextByTagNameNR(itemslist, "Location");
+        if(location == null)
+        {
+            location = "";
+        }
+        Element exactLocation = getElementByTagNameNR(itemslist, "Location");
+        String latitutde = exactLocation.getAttribute("Latitude");
+        String longitude = exactLocation.getAttribute("Longitude");
+        String country = getElementTextByTagNameNR(itemslist, "Country");
+        if(country == null)
+        {
+            country = "";
+        }
+        load(itemsDoc, itemID, userID, name, buy_price, description, 
+            first_bid, started, ends, currently, location, country, latitutde, longitude);
     }
     
     public static void parseUsers(Element itemslist) throws IOException
@@ -292,7 +309,7 @@ class MyParser {
         }
         String rating = sellingPerson.getAttribute("Rating");
         
-        Element[] bids = getElementsByTagNameNR(getElementByTagNameNR(itemslist, "Bidder"), "Bid");
+        Element[] bids = getElementsByTagNameNR(getElementByTagNameNR(itemslist, "Bids"), "Bid");
         for(int j = 0; j < bids.length; j++)
         {
             Element bidder = getElementByTagNameNR(bids[j], "Bidder");
@@ -308,7 +325,7 @@ class MyParser {
             {
                 bidderCountry = "";
             }
-            load(usersDoc, bidderID, bidderRating, bidderLocation, bidderCountry);
+            load(usersDoc, bidderID, bidderLocation, bidderCountry, bidderRating);
         }
         
         load(usersDoc, userID, location, country, rating);
