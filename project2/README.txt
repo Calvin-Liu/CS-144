@@ -1,3 +1,6 @@
+Team: Calvin Liu
+ID: 804182525
+
 Relations:
 	After discussion and learning about functional dependencies, we can
 set up the dependencies and compute the closure in reverse to know what the 

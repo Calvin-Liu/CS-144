@@ -3,6 +3,11 @@ SELECT COUNT(*)
 FROM Users;
 
 /*(2)*/
+SELECT COUNT(*)
+FROM Users U
+INNER JOIN Items I
+ON U.UserID = I.UserID
+WHERE BINARY I.Location = 'New York';
 
 /*(3)*/
 SELECT COUNT(*) 
@@ -14,37 +19,40 @@ FROM(
 ) AS G;
 
 /*(4)*/
-SELECT ItemID
-FROM(
-	SELECT I.ItemID, I.Currently
-	FROM Items I
-	INNER JOIN Bids B
-	ON I.ItemID = B.ItemID
-	WHERE Ends > '2001-12-20 00:00:01'
-	) AS BidI
-WHERE Currently = (
-	SELECT MAX(Currently)
-	FROM(
-		SELECT I.ItemID, I.Currently
-		FROM Items I
-		INNER JOIN Bids B
-		ON I.ItemID = B.ItemID
-		WHERE Ends > '2001-12-20 00:00:01'
-	) AS BidI
+SELECT B.ItemID
+FROM Bids B
+INNER JOIN Items I
+ON B.ItemID = I.ItemID
+WHERE Ends > '2001-12-20 00:00:01'
+AND Amount = (
+				SELECT MAX(Amount) 
+				FROM Bids
 );
 
 /*(5)*/
-/*
 SELECT COUNT(*)
 FROM(
 	SELECT COUNT(*)
 	FROM Users U
 	INNER JOIN Items I
 	ON U.UserID = I.UserID
-	WHERE U.Rating > 100;
-)
-*/
-/*(6)*/
+	GROUP BY U.UserID, U.Rating
+	HAVING U.Rating > 1000
+) AS G;
 
+/*(6)*/
+SELECT COUNT(*)
+FROM(
+	SELECT COUNT(*)
+	FROM Items I
+	INNER JOIN Bids B
+	ON B.UserID = I.UserID
+	GROUP BY B.UserID
+) AS G;
 
 /*(7)*/
+SELECT COUNT(DISTINCT Category)
+FROM Bids B
+INNER JOIN Categories C
+ON C.ItemID = B.ItemID
+WHERE B.Amount > 100; 
