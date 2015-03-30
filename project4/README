@@ -1,0 +1,17 @@
+1)
+Based on the diagram, I used SSL for steps (4) -> (5) and wanted to use it for (2) -> (3). I enabled it at step 4 when the credit card info is sent to the TOMCAT server because someone
+could be eavesdroppping during that time. Also I wanted to enable it at step 2 just to make the user feel like the whole transaction was safe as in a normal
+website like Amazon, where the user can see that the website is using https before they enter their card information. I did not implement SSL on (2)->(3) though because the spec said to only enable it when the credit card information is sent. Mostly everything in SSL ensures the user is protected during and after the purchase. I did not need to provide SSL for step 2, but it would make the user feel more secure. The most important thing
+is to secure the credit card number while the number is in transit which is steps (4)->(5) 
+
+2) To ensure the item was purchased exactly at the Buy_Price I first pulled the data from the oak server and then set the price in a session. I then retrieved the buy price of the item in an https page from the session I had in the servlet meaning that as long as the buy price shows up correctly in the https page then we know that an attacker did not change the buy price and that it is protected with SSL and it was stored in a session. Also, the attacker cannot modify the existing value since I pulled it directly from the server and never stored the buy_price in a variable in which they could tamper with. To mess with the buy_price the attacker would have to modify the information on the server.  
+
+
+EXTRA NOTES:
+I implemented the server to remember the session by using the http library function for creating a session. I chose to do it this way instead of dealing with creating a cookie. 
+
+I did not check if the credit card information is valid because the spec said that this requirement is not required.
+
+I also did not do much CSS as this is not a direct requirement
+
+If a user types in an invalid itemID, they will be brought to a blank page. This is ok as the TA's mentioned that as long as there is no 404/500 error then it is ok even though it would be best to display an error message.
