@@ -1,0 +1,14 @@
+Buildfile: /media/sf_vm-shared/project3/build.xml
+
+init:
+
+compile:
+     [echo] project3: /media/sf_vm-shared/project3/build.xml
+    [javac] Warning: edu/ucla/cs/cs144/Indexer.java modified in the future.
+    [javac] Compiling 1 source file to /media/sf_vm-shared/project3/bin
+
+run:
+     [java] java.sql.SQLException: Operation not allowed after ResultSet closed
+
+BUILD SUCCESSFUL
+Total time: 2 seconds
