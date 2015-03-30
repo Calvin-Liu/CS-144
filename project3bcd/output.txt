@@ -1,0 +1,19 @@
+Buildfile: /media/sf_vm-shared/project3bcd/build.xml
+
+init:
+
+compile:
+     [echo] project3-searcher: /media/sf_vm-shared/project3bcd/build.xml
+    [javac] Compiling 6 source files to /media/sf_vm-shared/project3bcd/bin
+
+run:
+     [java] Reply: Test message
+     [java] Basic Seacrh Query: superman
+     [java] org.apache.lucene.index.IndexNotFoundException: no segments* file found in NIOFSDirectory@/var/lib/lucene/Index lockFactory=NativeFSLockFactory@/var/lib/lucene/Index: files: [write.lock]
+     [java] 	at org.apache.lucene.index.SegmentInfos$FindSegmentsFile.run(SegmentInfos.java:864)
+     [java] 	at org.apache.lucene.index.StandardDirectoryReader.open(StandardDirectoryReader.java:53)
+     [java] 	at org.apache.lucene.index.DirectoryReader.open(DirectoryReader.java:67)
+     [java] 	at edu.ucla.cs.cs144.AuctionSearch.basicSearch(AuctionSearch.java:60)
+     [java] 	at edu.ucla.cs.cs144.AuctionSearchTest.main(AuctionSearchTest.java:20)
+     [java] Exception in thread "main" java.lang.NullPointerException
+     [java] 	at edu.ucla.cs.cs144.AuctionSearchTest.main(AuctionSearchTest.java:22)
